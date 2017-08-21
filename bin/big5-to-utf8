@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/cultivate'
+
+Cultivate.traverse(ARGV) do |path|
+  File.write(path, File.read(path, :encoding => 'big5-uao').encode('utf-8'))
+end
