@@ -13,13 +13,26 @@ module Cultivate
     end
   end
 
-  def self.connect path
+  def self.setup path
     require_relative 'cultivate/database'
-
-    existing_db = File.exist?(path)
-    Database.db = Sequel.connect("sqlite://#{path}")
-    Database.create_table unless existing_db
-
+    connect(path)
     require_relative 'cultivate/model'
+  end
+
+  def self.connect path
+    if File.exist?(path)
+      connect_db(path)
+    else
+      require 'fileutils'
+      FileUtils.mkdir_p(File.dirname(path))
+
+      connect_db(path)
+
+      Database.create_table
+    end
+  end
+
+  def self.connect_db path
+    Database.db = Sequel.connect("sqlite://#{path}")
   end
 end

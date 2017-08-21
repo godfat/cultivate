@@ -2,7 +2,7 @@
 
 require_relative '../lib/cultivate'
 
-Cultivate.connect(File.expand_path("#{__dir__}/../db/db.sqlite"))
+Cultivate.setup(File.expand_path("#{__dir__}/../db/db.sqlite"))
 
 Cultivate.traverse(ARGV) do |path|
   Cultivate::Patient.import(path)
