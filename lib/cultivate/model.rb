@@ -19,11 +19,19 @@ module Cultivate
 
     def self.import path
       CSV.read(path).drop(BeginOfData).each do |row|
-        if patient = self[row[OffsetId]]
-          update(patient, row)
-        else
-          insert(row)
+        begin
+          process(row)
+        rescue Sequel::NotNullConstraintViolation => e
+          warn "File '#{path}' contains a row without an id. Row: #{row}"
         end
+      end
+    end
+
+    def self.process row
+      if patient = self[row[OffsetId]]
+        update(patient, row)
+      else
+        insert(row)
       end
     end
 
