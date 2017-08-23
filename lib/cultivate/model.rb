@@ -18,11 +18,21 @@ module Cultivate
     one_to_many :test_results
 
     def self.import path
-      CSV.read(path).drop(BeginOfData).each do |row|
+      load_rows(path).each do |row|
         begin
           process(row)
         rescue Sequel::NotNullConstraintViolation => e
           warn "File '#{path}' contains a row without an id. Row: #{row}"
+        end
+      end
+    end
+
+    def self.load_rows path
+      CSV.read(path).drop(BeginOfData).inject([]) do |result, row|
+        if row.first
+          result << row
+        else # fix broken data by concating the last row
+          result << result.pop + row
         end
       end
     end
