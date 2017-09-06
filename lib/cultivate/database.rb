@@ -12,8 +12,7 @@ module Cultivate
     sample
     item
     bacteria
-    note
-    colony
+    comment
     application_date
     bed
     reqno
@@ -32,15 +31,10 @@ module Cultivate
         primary_key :id
 
         PatientColumns.each do |name|
-          case name
-          when :accepted_date, :number, :name, :reqno
-            column name, String, :null => false
-          else
-            column name, String, :null => true
-          end
+          column name, String, :null => false
         end
 
-        index [:reqno, :accepted_date], :unique => true
+        index [:reqno, :application_date], :unique => true
       end
     end
 

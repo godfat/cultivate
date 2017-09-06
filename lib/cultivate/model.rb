@@ -12,13 +12,14 @@ module Cultivate
 
   class Patient < Database
     BeginOfData = 4
+    CommentOffset = 7
 
     one_to_many :test_results
 
     def self.import path
       load_rows(path).each do |row|
         begin
-          attributes = Attributes.new(strip_row(row))
+          attributes = Attributes.new(fix_row(row))
           process(attributes)
         rescue Sequel::NotNullConstraintViolation => e
           warn \
@@ -60,8 +61,25 @@ module Cultivate
            :application_date => attributes.patient[:application_date])
     end
 
-    def self.strip_row row
-      row.map{ |r| if r then r.strip else r end }
+    def self.fix_row row
+      stripped_row = row.map{ |r| if r then r.strip else r end }
+
+      # those rows are always correct
+      correct_row = stripped_row.first(CommentOffset)
+
+      # find where the application date should be
+      application_date_index =
+        correct_row.size +
+        stripped_row[CommentOffset..-1].index do |r|
+          r =~ /\A\d{7}\z/
+        end
+
+      # construct the correct comment
+      comment = stripped_row[CommentOffset...application_date_index].join
+
+      # construct the correct row
+      (correct_row << comment).
+        concat(stripped_row[application_date_index..-1])
     end
   end
 
