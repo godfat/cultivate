@@ -41,7 +41,7 @@ module Cultivate
     def self.create_test_results
       db.create_table :test_results do
         primary_key :id
-        foreign_key :patient_id, :patients
+        foreign_key :patient_id, :patients, :null => false
 
         column :value, String, :null => false
       end
