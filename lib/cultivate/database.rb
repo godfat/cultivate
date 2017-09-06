@@ -7,7 +7,7 @@ module Cultivate
   PatientColumns = %i[
     accepted_date
     room
-    id
+    number
     name
     sample
     item
@@ -29,23 +29,27 @@ module Cultivate
 
     def self.create_patients
       db.create_table :patients do
-        column :id, String, :primary_key => true, :null => false
+        primary_key :id
 
         PatientColumns.each do |name|
-          next if name == :id
-
-          column name, String, :null => true
+          case name
+          when :accepted_date, :number, :name, :reqno
+            column name, String, :null => false
+          else
+            column name, String, :null => true
+          end
         end
+
+        index [:reqno, :accepted_date], :unique => true
       end
     end
 
     def self.create_test_results
       db.create_table :test_results do
         primary_key :id
+        foreign_key :patient_id, :patients
 
-        %i[patient_id value].each do |name|
-          column name, String, :null => false
-        end
+        column :value, String, :null => false
       end
     end
   end

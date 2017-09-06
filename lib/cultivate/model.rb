@@ -12,17 +12,17 @@ module Cultivate
 
   class Patient < Database
     BeginOfData = 4
-    OffsetId = 2
 
-    unrestrict_primary_key
     one_to_many :test_results
 
     def self.import path
       load_rows(path).each do |row|
         begin
-          process(row)
+          attributes = Attributes.new(strip_row(row))
+          process(attributes)
         rescue Sequel::NotNullConstraintViolation => e
-          warn "File '#{path}' contains a row without an id. Row: #{row}"
+          warn \
+          "\e[31m#{e.message}\e[0m\nFile: #{path}\nAttributes: #{attributes}"
         end
       end
     end
@@ -37,26 +37,31 @@ module Cultivate
       end
     end
 
-    def self.process row
-      if patient = self[row[OffsetId]]
-        update(patient, row)
+    def self.process attributes
+      if patient = lookup(attributes)
+        update(patient, attributes)
       else
-        insert(row)
+        insert(attributes)
       end
     end
 
-    def self.update patient, row
-      attributes = Attributes.new(row)
-
+    def self.update patient, attributes
       patient.update(attributes.patient)
       TestResult.insert(patient, attributes.test_results)
     end
 
-    def self.insert row
-      attributes = Attributes.new(row)
-
+    def self.insert attributes
       patient = Patient.create(attributes.patient)
       TestResult.insert(patient, attributes.test_results)
+    end
+
+    def self.lookup attributes
+      find(:reqno => attributes.patient[:reqno],
+           :application_date => attributes.patient[:application_date])
+    end
+
+    def self.strip_row row
+      row.map{ |r| if r then r.strip else r end }
     end
   end
 
