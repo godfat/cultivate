@@ -16,7 +16,7 @@ module Cultivate
     application_date
     bed
     reqno
-    serial
+    serialno
     amount
   ]
 
@@ -39,7 +39,7 @@ module Cultivate
           end
         end
 
-        index [:reqno, :application_date], :unique => true
+        index [:serialno, :application_date], :unique => true
       end
     end
 

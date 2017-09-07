@@ -57,7 +57,7 @@ module Cultivate
     end
 
     def self.lookup attributes
-      find(:serial => attributes.patient[:serial],
+      find(:serialno => attributes.patient[:serialno],
            :application_date => attributes.patient[:application_date])
     end
 
