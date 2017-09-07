@@ -31,7 +31,12 @@ module Cultivate
         primary_key :id
 
         PatientColumns.each do |name|
-          column name, String, :null => false
+          case name
+          when :reqno
+            column name, String, :null => true
+          else
+            column name, String, :null => false
+          end
         end
 
         index [:reqno, :application_date], :unique => true
