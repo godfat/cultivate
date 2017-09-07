@@ -17,13 +17,19 @@ module Cultivate
     one_to_many :test_results
 
     def self.import path
-      load_rows(path).each do |row|
-        begin
-          attributes = Attributes.new(fix_row(row))
-          process(attributes)
-        rescue Sequel::NotNullConstraintViolation => e
-          warn \
-          "\e[31m#{e.message}\e[0m\nFile: #{path}\nAttributes: #{attributes}"
+      load_rows(path).inject(nil) do |cut_row, row|
+        full_row =
+          if cut_row
+            cut_row.concat(row)
+          else
+            row
+          end
+
+        if fixed_row = fix_row(full_row)
+          process(Attributes.new(fixed_row))
+          nil
+        else
+          full_row # we try to concat with the next row
         end
       end
     end
@@ -44,6 +50,9 @@ module Cultivate
       else
         insert(attributes)
       end
+    rescue Sequel::NotNullConstraintViolation => e
+      warn \
+      "\e[31m#{e.message}\e[0m\nFile: #{path}\nAttributes: #{attributes}"
     end
 
     def self.update patient, attributes
@@ -68,18 +77,22 @@ module Cultivate
       correct_row = stripped_row.first(CommentOffset)
 
       # find where the application date should be
-      application_date_index =
-        correct_row.size +
+      app_date_relative_index =
         stripped_row[CommentOffset..-1].index do |r|
           r =~ /\A\d{7}\z/
         end
 
-      # construct the correct comment
-      comment = stripped_row[CommentOffset...application_date_index].join
+      if app_date_relative_index
+        app_date_index = app_date_relative_index + correct_row.size
 
-      # construct the correct row
-      (correct_row << comment).
-        concat(stripped_row[application_date_index..-1])
+        # construct the correct comment
+        comment = stripped_row[CommentOffset...app_date_index].join
+
+        # construct the correct row
+        (correct_row << comment).concat(stripped_row[app_date_index..-1])
+      else
+        # cut row, should be continued with the next row
+      end
     end
   end
 
