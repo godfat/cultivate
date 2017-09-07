@@ -17,7 +17,7 @@ module Cultivate
     one_to_many :test_results
 
     def self.import path
-      load_rows(path).inject(nil) do |cut_row, row|
+      left = load_rows(path).inject(nil) do |cut_row, row|
         full_row =
           if cut_row
             cut_row.concat(row)
@@ -32,6 +32,8 @@ module Cultivate
           full_row # we try to concat with the next row
         end
       end
+
+      warn "\e[31mLeft row?\e[0m\nFile: #{path}\nRow: #{left}"
     end
 
     def self.load_rows path
