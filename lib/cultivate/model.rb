@@ -33,7 +33,7 @@ module Cultivate
         end
       end
 
-      warn "\e[31mLeft row?\e[0m\nFile: #{path}\nRow: #{left}"
+      warn "\e[31mLeft row?\e[0m\nFile: #{path}\nRow: #{left}" if left
     end
 
     def self.load_rows path
