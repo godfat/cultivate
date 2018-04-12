@@ -1,6 +1,10 @@
 
-warn "This was tested on Ruby 2.4.1, but you're using #{RUBY_VERSION}" if
-  RUBY_VERSION != '2.4.1'
+ruby_version = '2.5.1'
+
+if RUBY_VERSION != ruby_version
+  warn "This was tested on Ruby #{ruby_version}," \
+       " but you're using #{RUBY_VERSION}"
+end
 
 module Cultivate
   def self.traverse paths, &block
