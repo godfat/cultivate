@@ -29,7 +29,22 @@ Pork::API.describe Cultivate::Patient do
 
         attribute = Cultivate::Attributes.new(fixed)
 
-        expect(attribute.patient[:comment]).eq 'broken-comment-continue'
+        expect(attribute.patient).
+          eq accepted_date: '1231212',
+             room: 'room',
+             number: 'number',
+             name: 'name',
+             sample: 'sample',
+             item: 'item',
+             bacteria: 'bacteria',
+             comment: 'broken-comment-continue',
+             application_date: '1231212',
+             bed: 'bed',
+             reqno: 'reqno',
+             serialno: 'serialno',
+             amount: 'amount'
+
+        expect(attribute.test_results).eq %w[test results]
       end
     end
   end
