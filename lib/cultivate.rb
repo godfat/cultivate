@@ -37,6 +37,12 @@ module Cultivate
   end
 
   def self.connect_db path
-    Database.db = Sequel.connect("sqlite://#{path}")
+    Database.db =
+      case path
+      when ':memory:'
+        Sequel.sqlite
+      else
+        Sequel.connect("sqlite://#{path}")
+      end
   end
 end
