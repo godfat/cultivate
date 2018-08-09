@@ -37,13 +37,21 @@ module Cultivate
     end
 
     def self.load_rows path
-      CSV.read(path).drop(BeginOfData).inject([]) do |result, row|
+      load_csv(path).drop(BeginOfData).inject([]) do |result, row|
         if row.first
           result << row
         else # fix broken data by concating the last row
           result << result.pop + row
         end
       end
+    end
+
+    def self.load_csv path
+      fixed_csv = File.read(path).gsub(/,?([^,]*"[^,]*),?/) do |m|
+        m.gsub($1, %Q{"#{$1.gsub('"', '""')}"})
+      end
+
+      CSV.parse(fixed_csv)
     end
 
     def self.process attributes
