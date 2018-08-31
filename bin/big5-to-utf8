@@ -5,5 +5,5 @@ require_relative '../lib/cultivate'
 Cultivate.traverse(ARGV) do |path|
   content = File.read(path, :encoding => 'big5-uao')
 
-  File.write(path, content).encode('utf-8') if content.valid_encoding?
+  File.write(path, content.encode('utf-8')) if content.valid_encoding?
 end
