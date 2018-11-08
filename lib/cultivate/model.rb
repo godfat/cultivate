@@ -26,7 +26,7 @@ module Cultivate
           end
 
         if fixed_row = fix_row(full_row)
-          process(Attributes.new(fixed_row))
+          process(Attributes.new(fixed_row), path)
           nil
         else
           full_row # we try to concat with the next row
@@ -54,7 +54,7 @@ module Cultivate
       CSV.parse(fixed_csv)
     end
 
-    def self.process attributes
+    def self.process attributes, path
       if patient = lookup(attributes)
         update(patient, attributes)
       else
