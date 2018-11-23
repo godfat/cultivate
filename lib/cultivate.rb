@@ -1,5 +1,5 @@
 
-ruby_version = '2.5.1'
+ruby_version = '2.5.3'
 
 if RUBY_VERSION != ruby_version
   warn "This was tested on Ruby #{ruby_version}," \

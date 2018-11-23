@@ -52,6 +52,9 @@ module Cultivate
       end
 
       CSV.parse(fixed_csv)
+    rescue ArgumentError => e
+      warn \
+      "\e[31m#{e.message}\e[0m\nFile: #{path}"
     end
 
     def self.process attributes, path
