@@ -47,7 +47,7 @@ module Cultivate
     end
 
     def self.load_csv path
-      fixed_csv = File.read(path).gsub(/,?([^,]*"[^,]*),?/) do |m|
+      fixed_csv = read_csv(path).gsub(/,?([^,]*"[^,]*),?/) do |m|
         m.gsub($1, %Q{"#{$1.gsub('"', '""')}"})
       end
 
@@ -55,6 +55,16 @@ module Cultivate
     rescue ArgumentError => e
       warn \
       "\e[31m#{e.message}\e[0m\nFile: #{path}"
+    end
+
+    def self.read_csv(path)
+      result = File.read(path)
+
+      if result.valid_encoding?
+        result
+      else
+        result.encode('UTF-8', 'BIG5-UAO')
+      end
     end
 
     def self.process attributes, path
